@@ -48,10 +48,10 @@ public class Home extends AppCompatActivity {
 
     private void fetchImages(Task<FlickrRecent> recentImages) {
         showProgressBar();
-        ThreadPoolFactory.getPool().queueTask(recentImages.build(Api.RECENT, result -> {
-            adapter.setPhotos(result.getPhotos().getPhoto().subList(0, 15));
+        ThreadPoolFactory.getPool().queueTask(recentImages.build(Api.RECENT, (result, link) -> {
+            adapter.setPhotos(result.getPhotos().getPhoto());
             hideProgressBar();
-        }, error -> {
+        }, (error, link) -> {
             Snackbar.make(recyclerView, error, Snackbar.LENGTH_LONG).show();
             hideProgressBar();
         }));
@@ -83,4 +83,5 @@ public class Home extends AppCompatActivity {
         }
         return super.onOptionsItemSelected(item);
     }
+
 }

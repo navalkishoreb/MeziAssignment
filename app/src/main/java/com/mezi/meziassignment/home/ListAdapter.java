@@ -56,9 +56,10 @@ public class ListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-        Log.d("Mezi", "Bind view " + position);
+//        Log.d("Mezi", "Bind view " + position);
         if (holder instanceof ImageViewHolder) {
             ImageViewHolder imageViewHolder = (ImageViewHolder) holder;
+            Log.d("Mezi", "Binding photo.... " + photos.get(position).getUrlN() + " position " + position);
             imageViewHolder.setPhoto(photos.get(position));
         }
     }

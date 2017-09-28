@@ -2,12 +2,10 @@ package com.mezi.meziassignment.tasks;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.os.Handler;
-import android.os.Looper;
 import android.util.Log;
-import android.util.LruCache;
 
 import com.mezi.meziassignment.base.Task;
+import com.mezi.meziassignment.base.ThreadPoolFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -19,56 +17,58 @@ import java.net.URL;
  */
 
 public class ImageDownload implements Task<Bitmap> {
-    private final static LruCache<String, Bitmap> cache = new LruCache<>(5);
-    private final static Handler handler = new Handler(Looper.getMainLooper());
+
 
     @Override
     public Runnable build(String link, OnTaskCompleteListener<Bitmap> onTaskCompleteListener, OnTaskErrorListener onTaskErrorListener) {
         return () -> {
             if (link != null) {
-                Bitmap bitmap = cache.get(link);
+                Bitmap bitmap = ThreadPoolFactory.getPool().getImageCache().get(link);
                 if (bitmap == null) {
                     fetchBitmap(link, onTaskCompleteListener, onTaskErrorListener);
                 } else {
                     Log.d("Mezi", "image fetched from cache");
-                    postBitmap(onTaskCompleteListener, bitmap);
+                    postBitmap(onTaskCompleteListener, bitmap, link);
                 }
             } else {
-                postError(onTaskErrorListener, "Link provided was NULL");
+                postError(onTaskErrorListener, "Link provided was NULL", null);
             }
         };
     }
 
-    private void postBitmap(OnTaskCompleteListener<Bitmap> onTaskCompleteListener, Bitmap bitmap) {
+    private void postBitmap(OnTaskCompleteListener<Bitmap> onTaskCompleteListener, Bitmap bitmap, String link) {
         if (onTaskCompleteListener != null) {
-            handler.post(() -> onTaskCompleteListener.onTaskComplete(bitmap));
+            ThreadPoolFactory.getPool().getUiHandler().post(() -> onTaskCompleteListener.onTaskComplete(bitmap, link));
         }
     }
 
-    private void postError(OnTaskErrorListener onTaskErrorListener, String error) {
+    private void postError(OnTaskErrorListener onTaskErrorListener, String error, String link) {
         if (onTaskErrorListener != null) {
-            handler.post(() -> onTaskErrorListener.onTaskError(error));
+            ThreadPoolFactory.getPool().getUiHandler().post(() -> onTaskErrorListener.onTaskError(error, link));
         }
     }
 
     private void fetchBitmap(String link, OnTaskCompleteListener<Bitmap> onTaskCompleteListener, OnTaskErrorListener onTaskErrorListener) {
         try {
+            Log.i("Mezi", "Fetching bitmap from network... " + link);
             URL url = new URL(link);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.connect();
             InputStream is = conn.getInputStream();
             Bitmap bitmap = BitmapFactory.decodeStream(is);
             if (bitmap != null) {
-                cache.put(link, bitmap);
-                postBitmap(onTaskCompleteListener, bitmap);
+                ThreadPoolFactory.getPool().getImageCache().put(link, bitmap);
+                Log.i("Mezi", "Posting bitmap.. " + link);
+                postBitmap(onTaskCompleteListener, bitmap, link);
             } else {
-                postError(onTaskErrorListener, "Bitmap received NULL");
+                Log.e("Mezi", "Posting error " + link);
+                postError(onTaskErrorListener, "Link provided was NULL", "Bitmap received NULL");
             }
 //                Thread.sleep(1000);
 
         } catch (IOException e) {
             e.printStackTrace();
-            postError(onTaskErrorListener, e.getMessage());
+            postError(onTaskErrorListener, "Link provided was NULL", e.getMessage());
         }
     }
 }

@@ -34,16 +34,28 @@ class ImageViewHolder extends RecyclerView.ViewHolder {
         if (!newPhoto.equals(photo)) {
             photo = newPhoto;
             resetPhotoView();
-            downloadImage();
+            fetchImage();
         } else {
-            Log.e("Mezi", "Same image in same view holder " + photo.getId());
+            Log.e("Mezi", "Same image in same view holder " + photo.getUrlN());
         }
     }
 
-    private void downloadImage() {
-        ThreadPoolFactory.getPool().queueTask(imageDownload.build(photo.getUrlN(), result -> {
-            if (result != null) {
-                Log.e("Mezi", "Setting image " + photo.getId());
+    private void fetchImage() {
+        Bitmap bitmap = ThreadPoolFactory.getPool().getImageCache().get(photo.getUrlN());
+        if (bitmap == null) {
+            fetchBitmap();
+        } else {
+            Log.d("Mezi", "image fetched from cache");
+            photoView.setImageBitmap(bitmap);
+        }
+
+
+    }
+
+    private void fetchBitmap() {
+        ThreadPoolFactory.getPool().queueTask(imageDownload.build(photo.getUrlN(), (result, link) -> {
+            if (result != null && link != null && (photo == null || (photo.getUrlN() != null && photo.getUrlN().equals(link)))) {
+                Log.i("Mezi", "Setting image. " + photo.getUrlN());
                 photoView.setImageBitmap(result);
                 photoView.setOnClickListener((view) -> {
                     Intent intent = new Intent(view.getContext(), ViewImage.class);
@@ -52,12 +64,13 @@ class ImageViewHolder extends RecyclerView.ViewHolder {
                 });
             }
 
-        }, error -> {
+        }, (error, link) -> {
             Log.e("Mezi", "Error downloading image " + error);
             photoView.setImageResource(R.mipmap.ic_launcher);
 
         }));
     }
+
 
     private void resetPhotoView() {
         photoView.setOnClickListener(null);
