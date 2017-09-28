@@ -46,7 +46,7 @@ class ImageViewHolder extends RecyclerView.ViewHolder {
             fetchBitmap();
         } else {
             Log.d("Mezi", "image fetched from cache");
-            photoView.setImageBitmap(bitmap);
+            setPhotoView(bitmap);
         }
 
 
@@ -56,12 +56,7 @@ class ImageViewHolder extends RecyclerView.ViewHolder {
         ThreadPoolFactory.getPool().queueTask(imageDownload.build(photo.getUrlN(), (result, link) -> {
             if (result != null && link != null && (photo == null || (photo.getUrlN() != null && photo.getUrlN().equals(link)))) {
                 Log.i("Mezi", "Setting image. " + photo.getUrlN());
-                photoView.setImageBitmap(result);
-                photoView.setOnClickListener((view) -> {
-                    Intent intent = new Intent(view.getContext(), ViewImage.class);
-                    intent.putExtra("image", result);
-                    view.getContext().startActivity(intent);
-                });
+                setPhotoView(result);
             }
 
         }, (error, link) -> {
@@ -71,6 +66,14 @@ class ImageViewHolder extends RecyclerView.ViewHolder {
         }));
     }
 
+    private void setPhotoView(Bitmap bitmap) {
+        photoView.setImageBitmap(bitmap);
+        photoView.setOnClickListener((view) -> {
+            Intent intent = new Intent(view.getContext(), ViewImage.class);
+            intent.putExtra("image", bitmap);
+            view.getContext().startActivity(intent);
+        });
+    }
 
     private void resetPhotoView() {
         photoView.setOnClickListener(null);
