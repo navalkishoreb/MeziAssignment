@@ -8,6 +8,7 @@ import android.view.View;
 import android.widget.ImageView;
 
 import com.mezi.meziassignment.R;
+import com.mezi.meziassignment.base.CacheFactory;
 import com.mezi.meziassignment.base.Task;
 import com.mezi.meziassignment.base.ThreadPoolFactory;
 import com.mezi.meziassignment.models.Photo;
@@ -41,7 +42,7 @@ class ImageViewHolder extends RecyclerView.ViewHolder {
     }
 
     private void fetchImage() {
-        Bitmap bitmap = ThreadPoolFactory.getPool().getImageCache().get(photo.getUrlN());
+        Bitmap bitmap = CacheFactory.getCache().get(photo.getUrlN());
         if (bitmap == null) {
             fetchBitmap();
         } else {

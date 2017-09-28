@@ -22,6 +22,7 @@ import java.util.List;
  */
 
 public class RecentImages implements Task<FlickrRecent> {
+    //    private final static Handler handler = new Handler(Looper.getMainLooper());
     @Override
     public Runnable build(String link, OnTaskCompleteListener<FlickrRecent> onTaskCompleteListener, OnTaskErrorListener onTaskErrorListener) {
         return () -> {

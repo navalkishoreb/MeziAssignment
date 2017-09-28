@@ -1,10 +1,5 @@
 package com.mezi.meziassignment.base;
 
-import android.graphics.Bitmap;
-import android.os.Handler;
-import android.os.Looper;
-import android.util.LruCache;
-
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -24,15 +19,12 @@ final class FifoThreadPool implements ThreadPool {
 
 
     private final ExecutorService executor;
-    private final static int CACHE_SIZE = 20 * 1024 * 1024;
-    private final static LruCache<String, Bitmap> cache = new LruCache<>(CACHE_SIZE);
-    private final static Handler handler = new Handler(Looper.getMainLooper());
+
 
     FifoThreadPool() {
-        System.out.println("Core size: " + Runtime.getRuntime().availableProcessors());
         //single thread executor since demand for sequential execution of tasks;
-        executor = Executors.newSingleThreadExecutor();
-//        executor = Executors.newFixedThreadPool(5);
+//        executor = Executors.newSingleThreadExecutor();
+        executor = Executors.newFixedThreadPool(5);
     }
 
     @Override
@@ -40,15 +32,6 @@ final class FifoThreadPool implements ThreadPool {
         executor.execute(runnable);
     }
 
-    @Override
-    public LruCache<String, Bitmap> getImageCache() {
-        return cache;
-    }
-
-    @Override
-    public Handler getUiHandler() {
-        return handler;
-    }
 
     @Override
     public void shutDown() {
