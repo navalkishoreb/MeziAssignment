@@ -39,3 +39,12 @@ https://api.flickr.com/services/rest/?method=flickr.photos.getRecent&api_key=d98
 To view logs:
 adb logcat -v threadtime Mezi:v *:s
 
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+
+- Observed problem: Since the application cannot cancel tasks; if one scrolls down rapidly and press refresh; screen won't refresh immediately since all tasks are running on single thread; and screen won't update until all other imageDownload tasks are done. 
+
