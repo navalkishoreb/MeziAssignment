@@ -1,0 +1,38 @@
+  Task<String> task = (link, onTaskCompleteListener, onTaskErrorListener) -> () -> {
+            Handler handler = new Handler(Looper.getMainLooper());
+            try {
+                URL url = new URL(link);
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                conn.connect();
+                InputStream is = conn.getInputStream();
+                BufferedReader reader = new BufferedReader(new InputStreamReader(is, "UTF-8"));
+                StringBuilder webPage = new StringBuilder();
+                String data = "";
+
+                while ((data = reader.readLine()) != null) {
+                    webPage.append(data).append("\n");
+                }
+                handler.post(() -> onTaskCompleteListener.onTaskComplete(webPage.toString()));
+
+            } catch (IOException e) {
+                e.printStackTrace();
+                handler.post(() -> onTaskErrorListener.onTaskError(e.getMessage()));
+            }
+        };
+
+
+
+            ThreadPoolFactory.getPool().queueTask(task.build("http://www.google.com", result -> {
+            if (result != null) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                    textView.setText(Html.fromHtml(result, Html.FROM_HTML_MODE_COMPACT));
+                } else {
+                    textView.setText(Html.fromHtml(result));
+                }
+            }
+
+        }, error -> {
+            if (error != null) {
+                textView.setText(error);
+            }
+        }));
