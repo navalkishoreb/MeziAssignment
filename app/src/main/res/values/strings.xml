@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">Mezi Assignment</string>
+    <string name="image">Image</string>
+    <string name="home">Home</string>
+    <string name="empty_list">No items to show</string>
+    <string name="refresh">Refresh</string>
+</resources>
