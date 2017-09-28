@@ -23,8 +23,8 @@ final class FifoThreadPool implements ThreadPool {
 
     FifoThreadPool() {
         //single thread executor since demand for sequential execution of tasks;
-//        executor = Executors.newSingleThreadExecutor();
-        executor = Executors.newFixedThreadPool(5);
+        executor = Executors.newSingleThreadExecutor();
+//        executor = Executors.newFixedThreadPool(5);
     }
 
     @Override
