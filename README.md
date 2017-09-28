@@ -21,11 +21,21 @@ https://api.flickr.com/services/rest/?method=flickr.photos.getRecent&api_key=d98
 - And load the images one by one in the background thread using the above FIFO Threadpool into ImageView, do not use any 3rd party libraries here too.
 
 
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
 
+- This application does not cover all network issue properly.
+- This application does not manages device rotation.
+- This application is not able to cancel a queued task.
+- Since Task 1->Task 2->Task 3 have to be executed sequentially, it is assumed to run them over a single thread.
+- This application uses GSON as json parsing library.
+- This application uses LRUCache to cache images for better response.
+<br />
+<br />
+To view logs:
+adb logcat -v threadtime Mezi:v *:s
 
-This application does not cover all network issue properly.
-This application does not manages device rotation.
-This application is not able to cancel a queued task.
-Since Task 1->Task 2->Task 3 have to be executed sequentially, it is assumed to run them over a single thread.
-This application uses GSON as json parsing library.
-This application uses LRUCache to cache images for better response.
